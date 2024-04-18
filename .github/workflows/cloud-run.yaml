@@ -7,8 +7,8 @@ on:
 concurrency: ${{ github.ref }}-${{ github.workflow }}
 
 env:
-  IMAGE: us-docker.pkg.dev/brandetize-sdbotox/docker-1/brandetize-fb-ads:${{ github.ref_name }}
-  SERVICE_NAME: brandetize-fb-ads-${{ github.ref_name }}
+  IMAGE: us-docker.pkg.dev/eaglytics/docker-1/aldinger-netsuite-backend:${{ github.ref_name }}
+  SERVICE_NAME: aldinger-netsuite-backend-${{ github.ref_name }}
 
 jobs:
   build-image:
@@ -52,9 +52,7 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           image: ${{ env.IMAGE }}
-          timeout: 1800s
-          secrets: |
-            DOPPLER_TOKEN=DOPPLER_TOKEN:latest
+          timeout: 120s
           flags: |
             --service-account ${{ env.GCP_SA }}
             --allow-unauthenticated
