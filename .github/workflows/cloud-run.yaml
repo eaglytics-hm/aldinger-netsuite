@@ -2,6 +2,9 @@ name: Cloud Run
 
 on:
   push:
+    paths:
+      - .github/**
+      - cloud-run/**
   workflow_dispatch:
 
 concurrency: ${{ github.ref }}-${{ github.workflow }}
@@ -28,6 +31,7 @@ jobs:
 
       - uses: docker/build-push-action@v5
         with:
+          context: ./cloud-run
           tags: ${{ env.IMAGE }}
           push: true
 
