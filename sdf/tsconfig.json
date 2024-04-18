@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "rootDir": "src/TypeScript",
+        "module": "amd",
+        "target": "es2020",
+        "moduleResolution": "node",
+        "paths": {
+            "N": [
+                "node_modules/@hitc/netsuite-types/N"
+            ],
+            "N/*": [
+                "node_modules/@hitc/netsuite-types/N/*"
+            ]
+        },
+        "outDir": "src/FileCabinet/SuiteScripts"
+    },
+    "include": [
+        "./src/TypeScript/**/*.ts",
+    ],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "commonjs"
+        }
+    }
+}

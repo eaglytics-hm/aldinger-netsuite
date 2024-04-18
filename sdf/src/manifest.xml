@@ -1,0 +1,18 @@
+<manifest projecttype="ACCOUNTCUSTOMIZATION">
+  <projectname>aldinger-sdf</projectname>
+  <frameworkversion>1.0</frameworkversion>
+  <dependencies>
+    <features>
+      <feature required="false">CRM</feature>
+      <feature required="true">CUSTOMRECORDS</feature>
+      <feature required="true">MULTILANGUAGE</feature>
+      <feature required="true">SERVERSIDESCRIPTING</feature>
+      <feature required="false">SUBSIDIARIES</feature>
+      <feature required="false">WEBSERVICES</feature>
+      <feature required="true">USR</feature>
+    </features>
+    <objects>
+      <object>customrole1001_9</object>
+    </objects>
+  </dependencies>
+</manifest>
