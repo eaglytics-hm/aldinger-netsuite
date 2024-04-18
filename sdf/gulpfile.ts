@@ -11,11 +11,11 @@ export const clean: TaskFunction = (done) => {
 
 export const build: TaskFunction = () => {
     const project = ts.createProject('tsconfig.json');
-    return gulp.src('./src/TypeScript/!(*.d).ts').pipe(project()).pipe(gulp.dest(dest));
+    return gulp.src('./src/TypeScript/**/!(*.d).ts').pipe(project()).pipe(gulp.dest(dest));
 };
 
 export const copy: TaskFunction = () => {
-    return gulp.src('./public/*.*').pipe(gulp.dest(dest));
+    return gulp.src('./public/**/*.*').pipe(gulp.dest(dest));
 };
 
 export default gulp.series(clean, gulp.parallel(build, copy));
