@@ -16,6 +16,10 @@ const getETLConfig = () => {
     const baseURL = 'https://aldinger-netsuite-backend-master-oisx3fkvoq-uc.a.run.app';
 
     const response = https.request({ method: 'POST', url: `${baseURL}/upload` });
+    if (response.code !== 200) {
+        log.error('Create upload file', { response });
+        return false;
+    }
     const { filename, url: gcsUrl } = <{ filename: string; url: string }>JSON.parse(response.body);
 
     const upload = (rows: any[]) => {
@@ -61,39 +65,45 @@ export const getInputData: EntryPoints.MapReduce.getInputData = () => {
 export const map: EntryPoints.MapReduce.map = (context) => {
     const value = JSON.parse(context.value);
 
-    const row = {
-        account: <string>value.values['name.account'],
-        business_unit: <string>value.values.class?.text,
-        customer_id: <number>parseInt(value.values['internalid.customer']?.value),
-        customer_industry: <string>value.values['custentity_esc_industry.customer']?.text,
-        customer_legacy_id: <number>parseInt(value.values['custentity_ald_legacy_id.customer']),
-        customer_name: <string>value.values['altname.customer'],
-        customer_territory: <string>value.values['territory.customer']?.text,
-        date: (() => {
-            const strValue = <string>value.values.trandate;
-            const date = dayjs(strValue);
-            return date.isValid() ? date.format('YYYY-MM-DD') : null;
-        })(),
-        document_number: <string>value.values.tranid,
-        invoice_line: <number>parseInt(value.values.linesequencenumber),
-        item_description: <string>value.values['salesdescription.item'],
-        item_display_name: <string>value.values['displayname.item'],
-        item_name: <string>value.values['itemid.item'],
-        item_rate: <number>value.values.rate,
-        location_name: <string>value.values['name.location'],
-        quantity: <number>value.values.quantity,
-        shipping_zip: <string>value.values.shipzip,
-    };
-    const data = mapValues(row, (value) => value || null);
-    log.debug('data', data);
+    const row = mapValues(
+        {
+            account: <string>value.values['name.account'],
+            business_unit: <string>value.values.class?.text,
+            customer_id: <number>parseInt(value.values['internalid.customer']?.value),
+            customer_industry: <string>value.values['custentity_esc_industry.customer']?.text,
+            customer_legacy_id: <number>parseInt(value.values['custentity_ald_legacy_id.customer']),
+            customer_name: <string>value.values['altname.customer'],
+            customer_territory: <string>value.values['territory.customer']?.text,
+            date: (() => {
+                const strValue = <string>value.values.trandate;
+                const date = dayjs(strValue);
+                return date.isValid() ? date.format('YYYY-MM-DD') : null;
+            })(),
+            document_number: <string>value.values.tranid,
+            invoice_line: <number>parseInt(value.values.linesequencenumber),
+            item_description: <string>value.values['salesdescription.item'],
+            item_display_name: <string>value.values['displayname.item'],
+            item_name: <string>value.values['itemid.item'],
+            item_rate: <number>parseFloat(value.values.rate),
+            location_name: <string>value.values['name.location'],
+            quantity: <number>parseFloat(value.values.quantity),
+            shipping_zip: <string>value.values.shipzip,
+        },
+        (value) => value || null,
+    );
 
-    context.write('data', data);
+    context.write('data', row);
 };
 
 export const reduce: EntryPoints.MapReduce.reduce = (context) => {
-    const { upload, loadFromGCS, filename } = getETLConfig();
+    const etlConfig = getETLConfig();
+    if (!etlConfig) {
+        log.error('Create ETL config failed', {});
+        return;
+    }
+
     const rows = context.values.map((row) => JSON.parse(row));
-    log.debug('rows', rows.slice(2));
+    const { upload, loadFromGCS, filename } = etlConfig;
 
     const isUploadSuccess = upload(rows);
     if (!isUploadSuccess) {

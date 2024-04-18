@@ -27,7 +27,7 @@ export const loadFromGCS = async (filename: string) => {
             { name: 'item_name', type: 'STRING' },
             { name: 'item_rate', type: 'NUMERIC' },
             { name: 'location_name', type: 'STRING' },
-            { name: 'quantity', type: 'INT64' },
+            { name: 'quantity', type: 'NUMERIC' },
             { name: 'shipping_zip', type: 'STRING' },
         ],
     };
