@@ -7,7 +7,7 @@
         "deploy": "suitecloud project:deploy"
     },
     "devDependencies": {
-        "@hitc/netsuite-types": "^2023.2.6",
+        "@hitc/netsuite-types": "^2024.1.2",
         "@oracle/suitecloud-cli": "^1.8.0",
         "@oracle/suitecloud-unit-testing": "^1.4.1",
         "@types/gulp": "^4.0.17",
