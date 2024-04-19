@@ -14,15 +14,16 @@
       <loglevel>DEBUG</loglevel>
       <queueallstagesatonce>T</queueallstagesatonce>
       <runasrole>ADMINISTRATOR</runasrole>
-      <status>NOTSCHEDULED</status>
+      <status>SCHEDULED</status>
       <title>[EAG] Invoice ETL MR</title>
       <yieldaftermins>60</yieldaftermins>
       <recurrence>
-        <single>
+        <daily>
+          <everyxdays>1</everyxdays>
           <repeat></repeat>
-          <startdate>2024-04-18</startdate>
-          <starttime>23:00:00Z</starttime>
-        </single>
+          <startdate>2024-01-01</startdate>
+          <starttime>06:00:00Z</starttime>
+        </daily>
       </recurrence>
     </scriptdeployment>
   </scriptdeployments>
