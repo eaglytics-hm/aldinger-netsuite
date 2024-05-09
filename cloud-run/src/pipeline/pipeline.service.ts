@@ -13,6 +13,7 @@ export const loadFromGCS = async (filename: string) => {
         table: tableName,
         schema: [
             { name: 'account', type: 'STRING' },
+            { name: 'amount', type: 'NUMERIC' },
             { name: 'business_unit', type: 'STRING' },
             { name: 'customer_id', type: 'INT64' },
             { name: 'customer_industry', type: 'STRING' },
@@ -25,7 +26,6 @@ export const loadFromGCS = async (filename: string) => {
             { name: 'item_description', type: 'STRING' },
             { name: 'item_display_name', type: 'STRING' },
             { name: 'item_name', type: 'STRING' },
-            { name: 'item_rate', type: 'NUMERIC' },
             { name: 'location_name', type: 'STRING' },
             { name: 'quantity', type: 'NUMERIC' },
             { name: 'shipping_zip', type: 'STRING' },
