@@ -60,35 +60,36 @@ const getETLConfig = () => {
 };
 
 export const getInputData: EntryPoints.MapReduce.getInputData = () => {
-    return search.load({ id: 'customsearch_eag_invoice_lines' });
+    return search.load({ id: 'customsearch_ald_invoice_line_detail' });
 };
 
 export const map: EntryPoints.MapReduce.map = (context) => {
-    const value = JSON.parse(context.value);
+    const { values } = JSON.parse(context.value);
+    log.debug('value', values);
 
     const row = mapValues(
         {
-            account: <string>value.values['name.account'],
-            business_unit: <string>value.values.class?.text,
-            customer_id: <number>parseInt(value.values['internalid.customer']?.value),
-            customer_industry: <string>value.values['custentity_esc_industry.customer']?.text,
-            customer_legacy_id: <number>parseInt(value.values['custentity_ald_legacy_id.customer']),
-            customer_name: <string>value.values['altname.customer'],
-            customer_territory: <string>value.values['territory.customer']?.text,
+            account: <string>values['name.account'],
+            amount: <number>parseFloat(values['amount']),
+            business_unit: <string>values.class?.text,
+            customer_id: <number>parseInt(values['internalid.customer']?.value),
+            customer_industry: <string>values['custentity_esc_industry.customer']?.text,
+            customer_legacy_id: <number>parseInt(values['custentity_ald_legacy_id.customer']),
+            customer_name: <string>values['altname.customer'],
+            customer_territory: <string>values['territory.customer']?.text,
             date: (() => {
-                const strValue = <string>value.values.trandate;
+                const strValue = <string>values.trandate;
                 const date = dayjs(strValue);
                 return date.isValid() ? date.format('YYYY-MM-DD') : null;
             })(),
-            document_number: <string>value.values.tranid,
-            invoice_line: <number>parseInt(value.values.linesequencenumber),
-            item_description: <string>value.values['salesdescription.item'],
-            item_display_name: <string>value.values['displayname.item'],
-            item_name: <string>value.values['itemid.item'],
-            item_rate: <number>parseFloat(value.values.rate),
-            location_name: <string>value.values['name.location'],
-            quantity: <number>parseFloat(value.values.quantity),
-            shipping_zip: <string>value.values.shipzip,
+            document_number: <string>values.tranid,
+            invoice_line: <number>parseInt(values.linesequencenumber),
+            item_description: <string>values['salesdescription.item'],
+            item_display_name: <string>values['displayname.item'],
+            item_name: <string>values['itemid.item'],
+            location_name: <string>values['name.location'],
+            quantity: <number>parseFloat(values.quantity),
+            shipping_zip: <string>values.shipzip,
         },
         (value) => value || null,
     );
@@ -122,5 +123,4 @@ export const reduce: EntryPoints.MapReduce.reduce = (context) => {
     }
 
     log.audit('ETL completed', { filename });
-    return;
 };
