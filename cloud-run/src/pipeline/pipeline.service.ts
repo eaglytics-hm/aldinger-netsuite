@@ -23,7 +23,6 @@ export const loadFromGCS = async (filename: string) => {
             { name: 'date', type: 'DATE' },
             { name: 'document_number', type: 'STRING' },
             { name: 'invoice_line', type: 'INT64' },
-            { name: 'item_description', type: 'STRING' },
             { name: 'item_display_name', type: 'STRING' },
             { name: 'item_name', type: 'STRING' },
             { name: 'location_name', type: 'STRING' },
