@@ -65,11 +65,11 @@ export const getInputData: EntryPoints.MapReduce.getInputData = () => {
 
 export const map: EntryPoints.MapReduce.map = (context) => {
     const { values } = JSON.parse(context.value);
-    log.debug('value', values);
+    log.debug('values', values);
 
     const row = mapValues(
         {
-            account: <string>values['name.account'],
+            account: <string>values.account?.text,
             amount: <number>parseFloat(values['amount']),
             business_unit: <string>values.class?.text,
             customer_id: <number>parseInt(values['internalid.customer']?.value),
@@ -84,10 +84,9 @@ export const map: EntryPoints.MapReduce.map = (context) => {
             })(),
             document_number: <string>values.tranid,
             invoice_line: <number>parseInt(values.linesequencenumber),
-            item_description: <string>values['salesdescription.item'],
             item_display_name: <string>values['displayname.item'],
             item_name: <string>values['itemid.item'],
-            location_name: <string>values['name.location'],
+            location_name: <string>values.location?.text,
             quantity: <number>parseFloat(values.quantity),
             shipping_zip: <string>values.shipzip,
         },
