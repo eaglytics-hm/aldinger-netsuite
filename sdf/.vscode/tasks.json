@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "suitecloud:upload-one",
+            "type": "shell",
+            "command": [
+                "npx",
+                "gulp",
+                "upload",
+                "--file",
+                "${fileBasenameNoExtension}"
+            ]
+        },
+        {
+            "label": "suitecloud:upload",
+            "type": "shell",
+            "command": [
+                "npx",
+                "gulp",
+                "upload",
+            ]
+        },
+        {
+            "label": "suitecloud:tsc-watch",
+            "type": "shell",
+            "command": [
+                "npx",
+                "tsc",
+                "--watch",
+            ]
+        }
+    ]
+}
