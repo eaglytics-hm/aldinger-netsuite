@@ -72,7 +72,7 @@ export const map: EntryPoints.MapReduce.map = (context) => {
             account: <string>values.account?.text,
             amount: <number>parseFloat(values['amount']),
             business_unit: <string>values.class?.text,
-            customer_id: <string>values['internalid.customer']?.text,
+            customer_id: <string>values['entityid.customer'],
             customer_industry: <string>values['custentity_esc_industry.customer']?.text,
             customer_legacy_id: <string>values['custentity_ald_legacy_id.customer'],
             customer_name: <string>values['altname.customer'],
