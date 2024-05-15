@@ -64,31 +64,30 @@ export const getInputData: EntryPoints.MapReduce.getInputData = () => {
 };
 
 export const map: EntryPoints.MapReduce.map = (context) => {
-    const { values } = JSON.parse(context.value);
-    log.debug('values', values);
+    const result = <search.Result>JSON.parse(context.value).values;
+    log.debug('result', result);
 
     const row = mapValues(
         {
-            account: <string>values.account?.text,
-            amount: <number>parseFloat(values['amount']),
-            business_unit: <string>values.class?.text,
-            customer_id: <string>values['entityid.customer'],
-            customer_industry: <string>values['custentity_esc_industry.customer']?.text,
-            customer_legacy_id: <string>values['custentity_ald_legacy_id.customer'],
-            customer_name: <string>values['altname.customer'],
-            customer_territory: <string>values['territory.customer']?.text,
+            account: <string>result.getText('account'),
+            amount: <number>Number(result.getValue('amount')),
+            business_unit: <string>result.getText('class'),
+            customer_id: <string>result.getValue('entityid.customer'),
+            customer_industry: <string>result.getText('custentity_esc_industry.customer'),
+            customer_legacy_id: <string>result.getValue('custentity_ald_legacy_id.customer'),
+            customer_name: <string>result.getValue('altname.customer'),
+            customer_territory: <string>result.getText('territory.customer'),
             date: (() => {
-                const strValue = <string>values.trandate;
-                const date = dayjs(strValue);
+                const date = dayjs(<string | Date>result.getValue('trandate'));
                 return date.isValid() ? date.format('YYYY-MM-DD') : null;
             })(),
-            document_number: <string>values.tranid,
-            invoice_line: <number>parseInt(values.linesequencenumber),
-            item_display_name: <string>values['displayname.item'],
-            item_name: <string>values['itemid.item'],
-            location_name: <string>values.location?.text,
-            quantity: <number>parseFloat(values.quantity),
-            shipping_zip: <string>values.shipzip,
+            document_number: <string>result.getValue('tranid'),
+            invoice_line: <number>Number(result.getValue('linesequencenumber')),
+            item_display_name: <string>result.getValue('displayname.item'),
+            item_name: <string>result.getValue('itemid.item'),
+            location_name: <string>result.getText('location'),
+            quantity: <number>Number(result.getValue('quantity')),
+            shipping_zip: <string>result.getValue('shipzip'),
         },
         (value) => value || null,
     );
