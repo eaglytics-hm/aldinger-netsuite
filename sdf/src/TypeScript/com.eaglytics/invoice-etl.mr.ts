@@ -14,7 +14,7 @@ import dayjs from './dayjs.min';
 import { mapValues } from './lodash-amd';
 
 const getETLConfig = () => {
-    const baseURL = 'https://aldinger-netsuite-backend-master-oisx3fkvoq-uc.a.run.app';
+    const baseURL = 'https://aldinger-netsuite-backend-master-jh2uvgk35a-uc.a.run.app';
 
     const response = https.request({ method: 'POST', url: `${baseURL}/upload` });
     if (response.code !== 200) {
