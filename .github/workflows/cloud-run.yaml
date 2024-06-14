@@ -10,7 +10,7 @@ on:
 concurrency: ${{ github.ref }}-${{ github.workflow }}
 
 env:
-  IMAGE: us-docker.pkg.dev/eaglytics-project/docker-1/aldinger-netsuite-backend:${{ github.ref_name }}
+  IMAGE: us-docker.pkg.dev/aldinger-426410/docker-1/aldinger-netsuite-backend:${{ github.ref_name }}
   SERVICE_NAME: aldinger-netsuite-backend-${{ github.ref_name }}
 
 jobs:
