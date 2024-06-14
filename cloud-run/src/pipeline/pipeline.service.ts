@@ -9,7 +9,7 @@ export const loadFromGCS = async (filename: string) => {
     logger.info(`Loading file ${filename} from GCS to ${tableName}`);
 
     const loadOptions = {
-        dataset: 'AldingerNetSuite',
+        dataset: 'NetSuite',
         table: tableName,
         schema: [
             { name: 'account', type: 'STRING' },
