@@ -3,7 +3,7 @@ import { v4 as uuid4 } from 'uuid';
 
 const client = new Storage();
 
-const bucket = 'aldinger-netsuite';
+const bucket = '460837084029-us-netsuite';
 
 export const getUploadURL = async () => {
     const filename = `${uuid4()}.ndjson`;
