@@ -1,13 +1,10 @@
 import { getUploadURL } from './cloud-storage.service';
 
-it('get-upload-url', async () => {
-    return await getUploadURL()
-        .then((result) => {
-            console.log({ result });
-            expect(result).toBeDefined();
-        })
-        .catch((error) => {
-            console.error({ error });
-            throw error;
-        });
+it('getUploadURL', async () => {
+    try {
+        const result = await getUploadURL();
+        expect(result).toBeDefined();
+    } catch (error) {
+        throw error;
+    }
 });
