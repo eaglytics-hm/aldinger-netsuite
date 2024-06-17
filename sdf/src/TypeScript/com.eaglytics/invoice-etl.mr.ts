@@ -64,30 +64,30 @@ export const getInputData: EntryPoints.MapReduce.getInputData = () => {
 };
 
 export const map: EntryPoints.MapReduce.map = (context) => {
-    const result = <search.Result>JSON.parse(context.value).values;
-    log.debug('result', result);
+    const { values } = JSON.parse(context.value);
 
     const row = mapValues(
         {
-            account: <string>result.getText('account'),
-            amount: <number>Number(result.getValue('amount')),
-            business_unit: <string>result.getText('class'),
-            customer_id: <string>result.getValue('entityid.customer'),
-            customer_industry: <string>result.getText('custentity_esc_industry.customer'),
-            customer_legacy_id: <string>result.getValue('custentity_ald_legacy_id.customer'),
-            customer_name: <string>result.getValue('altname.customer'),
-            customer_territory: <string>result.getText('territory.customer'),
+            account: <string>values.account?.text,
+            amount: <number>parseFloat(values['amount']),
+            business_unit: <string>values.class?.text,
+            customer_id: <string>values['entityid.customer'],
+            customer_industry: <string>values['custentity_esc_industry.customer']?.text,
+            customer_legacy_id: <string>values['custentity_ald_legacy_id.customer'],
+            customer_name: <string>values['altname.customer'],
+            customer_territory: <string>values['territory.customer']?.text,
             date: (() => {
-                const date = dayjs(<string | Date>result.getValue('trandate'));
+                const strValue = <string>values.trandate;
+                const date = dayjs(strValue);
                 return date.isValid() ? date.format('YYYY-MM-DD') : null;
             })(),
-            document_number: <string>result.getValue('tranid'),
-            invoice_line: <number>Number(result.getValue('linesequencenumber')),
-            item_display_name: <string>result.getValue('displayname.item'),
-            item_name: <string>result.getValue('itemid.item'),
-            location_name: <string>result.getText('location'),
-            quantity: <number>Number(result.getValue('quantity')),
-            shipping_zip: <string>result.getValue('shipzip'),
+            document_number: <string>values.tranid,
+            invoice_line: <number>parseInt(values.linesequencenumber),
+            item_display_name: <string>values['displayname.item'],
+            item_name: <string>values['itemid.item'],
+            location_name: <string>values.location?.text,
+            quantity: <number>parseFloat(values.quantity),
+            shipping_zip: <string>values.shipzip,
         },
         (value) => value || null,
     );
@@ -103,8 +103,8 @@ export const reduce: EntryPoints.MapReduce.reduce = (context) => {
         throw _error;
     }
 
-    const rows = context.values.map((row) => JSON.parse(row));
     const { upload, loadFromGCS, filename } = etlConfig;
+    const rows = context.values.map((row) => JSON.parse(row));
 
     const isUploadSuccess = upload(rows);
     if (!isUploadSuccess) {
