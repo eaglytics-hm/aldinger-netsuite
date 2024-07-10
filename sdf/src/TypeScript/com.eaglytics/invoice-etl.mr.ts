@@ -13,50 +13,47 @@ import * as search from 'N/search';
 import dayjs from './dayjs.min';
 import { mapValues } from './lodash-amd';
 
-const getETLConfig = () => {
+const upload = (rows: any[]) => {
     const baseURL = 'https://aldinger-netsuite-backend-master-jh2uvgk35a-uc.a.run.app';
 
-    const response = https.request({ method: 'POST', url: `${baseURL}/upload` });
-    if (response.code !== 200) {
-        log.error('Create upload file', { response: response.body });
-        return false;
+    const getUploadUrlResponse = https.request({ method: 'POST', url: `${baseURL}/upload` });
+    if (getUploadUrlResponse.code !== 200) {
+        log.error('Create upload file', { response: getUploadUrlResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Create ETL config failed' });
+        return [_error, null] as const;
     }
-    const { filename, url: gcsUrl } = <{ filename: string; url: string }>JSON.parse(response.body);
 
-    const upload = (rows: any[]) => {
-        const response = https.request({
-            method: https.Method.PUT,
-            url: gcsUrl,
-            headers: { 'Content-Type': 'text/plain' },
-            body: rows.map((row) => JSON.stringify(row)).join('\n'),
-        });
-        if (response.code !== 200) {
-            log.error('Upload to GCS', { url: gcsUrl, response: response.body });
-            return false;
-        }
+    const { filename, url: gcsUrl } = <{ filename: string; url: string }>JSON.parse(getUploadUrlResponse.body);
 
-        log.audit('Upload to GCS', { filename });
-        return true;
-    };
+    const uploadResponse = https.request({
+        method: https.Method.PUT,
+        url: gcsUrl,
+        headers: { 'Content-Type': 'text/plain' },
+        body: rows.map((row) => JSON.stringify(row)).join('\n'),
+    });
+    if (uploadResponse.code !== 200) {
+        log.error('Upload to GCS', { url: gcsUrl, response: uploadResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Upload to GCS failed' });
+        log.error(_error.message, _error);
+        return [_error, null] as const;
+    }
 
-    const loadFromGCS = () => {
-        const response = https.request({
-            method: 'POST',
-            url: `${baseURL}/load`,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename }),
-        });
+    const loadResponse = https.request({
+        method: 'POST',
+        url: `${baseURL}/load`,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename }),
+    });
 
-        if (response.code !== 200) {
-            log.error('Load from GCS', { filename, response: response.body });
-            return false;
-        }
+    if (loadResponse.code !== 200) {
+        log.error('Load from GCS', { filename, response: loadResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Load from GCS failed' });
+        log.error(_error.message, _error);
+        return [_error, null] as const;
+    }
 
-        log.audit('Load from GCS', { filename, response: response.body });
-        return true;
-    };
-
-    return { upload, loadFromGCS, filename };
+    log.audit('Load from GCS', { filename, response: loadResponse.body });
+    return [null, filename] as const;
 };
 
 export const getInputData: EntryPoints.MapReduce.getInputData = () => {
@@ -96,29 +93,12 @@ export const map: EntryPoints.MapReduce.map = (context) => {
 };
 
 export const reduce: EntryPoints.MapReduce.reduce = (context) => {
-    const etlConfig = getETLConfig();
-    if (!etlConfig) {
-        const _error = error.create({ name: 'API_ERROR', message: 'Create ETL config failed' });
-        log.error(_error.message, _error);
-        throw _error;
-    }
-
-    const { upload, loadFromGCS, filename } = etlConfig;
     const rows = context.values.map((row) => JSON.parse(row));
 
-    const isUploadSuccess = upload(rows);
-    if (!isUploadSuccess) {
-        const _error = error.create({ name: 'API_ERROR', message: 'Upload to GCS failed' });
+    const [_error, filename] = upload(rows);
+    if (_error && !filename) {
         log.error(_error.message, _error);
         throw _error;
     }
-
-    const isLoadFromGCSSuccess = loadFromGCS();
-    if (!isLoadFromGCSSuccess) {
-        const _error = error.create({ name: 'API_ERROR', message: 'Load from GCS failed' });
-        log.error(_error.message, _error);
-        throw _error;
-    }
-
     log.audit('ETL completed', { filename });
 };
