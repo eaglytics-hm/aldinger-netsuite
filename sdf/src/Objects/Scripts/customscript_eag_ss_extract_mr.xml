@@ -1,7 +1,7 @@
-<mapreducescript scriptid="customscript_eag_ss_extract">
+<mapreducescript scriptid="customscript_eag_ss_extract_mr">
   <description></description>
   <isinactive>F</isinactive>
-  <name>[EAG] Saved Search Extract</name>
+  <name>[EAG] Saved Search Extract MR</name>
   <notifyadmins>F</notifyadmins>
   <notifyemails></notifyemails>
   <notifyowner>T</notifyowner>
