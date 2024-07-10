@@ -8,6 +8,7 @@ import { EntryPoints } from 'N/types';
 import * as error from 'N/error';
 import * as https from 'N/https';
 import * as log from 'N/log';
+import * as runtime from 'N/runtime';
 import * as search from 'N/search';
 
 import dayjs from './dayjs.min';
@@ -59,15 +60,10 @@ const getETLConfig = () => {
     return { upload, loadFromGCS, filename };
 };
 
-export const getInputData: EntryPoints.MapReduce.getInputData = () => {
-    return search.load({ id: 'customsearch_ald_invoice_line_detail' });
-};
-
-export const map: EntryPoints.MapReduce.map = (context) => {
-    const { values } = JSON.parse(context.value);
-
-    const row = mapValues(
-        {
+const configs = {
+    customdeploy_eag_ss_extract_1772: {
+        id: 1772,
+        parse: (values: any) => ({
             account: <string>values.account?.text,
             amount: <number>parseFloat(values['amount']),
             business_unit: <string>values.class?.text,
@@ -88,10 +84,81 @@ export const map: EntryPoints.MapReduce.map = (context) => {
             location_name: <string>values.location?.text,
             quantity: <number>parseFloat(values.quantity),
             shipping_zip: <string>values.shipzip,
-        },
-        (value) => value || null,
-    );
+        }),
+        table: 'InvoiceLine',
+        schema: [
+            { name: 'account', type: 'STRING' },
+            { name: 'amount', type: 'NUMERIC' },
+            { name: 'business_unit', type: 'STRING' },
+            { name: 'customer_id', type: 'STRING' },
+            { name: 'customer_industry', type: 'STRING' },
+            { name: 'customer_legacy_id', type: 'STRING' },
+            { name: 'customer_name', type: 'STRING' },
+            { name: 'customer_territory', type: 'STRING' },
+            { name: 'date', type: 'DATE' },
+            { name: 'document_number', type: 'STRING' },
+            { name: 'invoice_line', type: 'INT64' },
+            { name: 'item_display_name', type: 'STRING' },
+            { name: 'item_name', type: 'STRING' },
+            { name: 'location_name', type: 'STRING' },
+            { name: 'quantity', type: 'NUMERIC' },
+            { name: 'shipping_zip', type: 'STRING' },
+        ],
+    },
+    customdeploy_eag_ss_extract_1722: {
+        id: 1722,
+        parse: (values: any) => ({
+            id: <string>values.entityid,
+            name: <string>values.altname,
+            stage: <string>values.stage?.text,
+            email: <string>values.email,
+            phone: <string>values.custentity_ald_businessunit?.text,
+            legacy_id: values.custentity_ald_legacy_id,
+            terms: <string>values.terms?.text,
+            industry: <string>values.custentity_esc_industry?.text,
+            territory: <string>values.territory?.text,
+            salesrep: <string>values.salesrep?.text,
+            leadsource: <string>values.leadsource?.text,
+            datecreated: (() => {
+                const strValue = <string>values.datecreated;
+                const date = dayjs(strValue);
+                return date.isValid() ? date.toISOString() : null;
+            })(),
+            billing_address: <string>values.billaddress,
+            billing_state: <string>values.billstate?.text,
+            billing_zip: <string>values.billzipcode,
+        }),
+        table: 'Customer',
+        schema: [
+            { name: 'id', type: 'STRING' },
+            { name: 'name', type: 'STRING' },
+            { name: 'stage', type: 'STRING' },
+            { name: 'email', type: 'STRING' },
+            { name: 'phone', type: 'STRING' },
+            { name: 'legacy_id', type: 'STRING' },
+            { name: 'terms', type: 'STRING' },
+            { name: 'industry', type: 'STRING' },
+            { name: 'territory', type: 'STRING' },
+            { name: 'salesrep', type: 'STRING' },
+            { name: 'leadsource', type: 'STRING' },
+            { name: 'datecreated', type: 'TIMESTAMP' },
+            { name: 'billing_address', type: 'STRING' },
+            { name: 'billing_state', type: 'STRING' },
+            { name: 'billing_zip', type: 'STRING' },
+        ],
+    },
+};
 
+export const getInputData: EntryPoints.MapReduce.getInputData = () => {
+    const { deploymentId } = runtime.getCurrentScript();
+    return search.load({ id: configs[deploymentId as keyof typeof configs].id });
+};
+
+export const map: EntryPoints.MapReduce.map = (context) => {
+    const { deploymentId } = runtime.getCurrentScript();
+    const { values } = JSON.parse(context.value);
+    log.audit('values', values);
+    const row = mapValues(configs[deploymentId as keyof typeof configs].parse(values), (value) => value || null);
     context.write('data', row);
 };
 
