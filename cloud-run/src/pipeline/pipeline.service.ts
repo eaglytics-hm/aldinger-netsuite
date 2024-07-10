@@ -1,35 +1,24 @@
-import { load } from '../google-cloud/bigquery.service';
+import { BigQuery, TableSchema } from '@google-cloud/bigquery';
+
 import { getFile } from '../google-cloud/cloud-storage.service';
 import { getLogger } from '../logging.service';
 
 const logger = getLogger(__filename);
+const client = new BigQuery();
+const dataset = client.dataset('NetSuite');
 
-export const loadFromGCS = async (filename: string) => {
-    const tableName = 'InvoiceLines';
-    logger.info(`Loading file ${filename} from GCS to ${tableName}`);
+export type LoadFromGCSOptions = { filename: string; table: string; schema: TableSchema['fields'] };
 
-    const loadOptions = {
-        dataset: 'NetSuite',
-        table: tableName,
-        schema: [
-            { name: 'account', type: 'STRING' },
-            { name: 'amount', type: 'NUMERIC' },
-            { name: 'business_unit', type: 'STRING' },
-            { name: 'customer_id', type: 'STRING' },
-            { name: 'customer_industry', type: 'STRING' },
-            { name: 'customer_legacy_id', type: 'STRING' },
-            { name: 'customer_name', type: 'STRING' },
-            { name: 'customer_territory', type: 'STRING' },
-            { name: 'date', type: 'DATE' },
-            { name: 'document_number', type: 'STRING' },
-            { name: 'invoice_line', type: 'INT64' },
-            { name: 'item_display_name', type: 'STRING' },
-            { name: 'item_name', type: 'STRING' },
-            { name: 'location_name', type: 'STRING' },
-            { name: 'quantity', type: 'NUMERIC' },
-            { name: 'shipping_zip', type: 'STRING' },
-        ],
-    };
+export const loadFromGCS = async ({ filename, table, schema }: LoadFromGCSOptions) => {
+    logger.info(`Loading file ${filename} from GCS to ${table}`);
 
-    return await load(loadOptions, getFile(filename)).then(() => ({ filename }));
+    return await dataset
+        .table(table)
+        .load(getFile(filename), {
+            schema: { fields: schema },
+            sourceFormat: 'NEWLINE_DELIMITED_JSON',
+            createDisposition: 'CREATE_IF_NEEDED',
+            writeDisposition: 'WRITE_TRUNCATE',
+        })
+        .then(() => ({ filename }));
 };

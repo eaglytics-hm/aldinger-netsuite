@@ -5,22 +5,19 @@ const client = new Storage();
 
 const bucket = '460837084029-us-netsuite';
 
+export const getFile = (filename: string) => {
+    return client.bucket(bucket).file(filename);
+};
+
 export const getUploadURL = async () => {
     const filename = `${uuid4()}.ndjson`;
 
-    const [url] = await client
-        .bucket(bucket)
-        .file(filename)
-        .getSignedUrl({
-            version: 'v4',
-            action: 'write',
-            expires: Date.now() + 60 * 60 * 1000,
-            contentType: 'text/plain',
-        });
+    const [url] = await getFile(filename).getSignedUrl({
+        version: 'v4',
+        action: 'write',
+        expires: Date.now() + 60 * 60 * 1000,
+        contentType: 'text/plain',
+    });
 
     return { filename, url };
-};
-
-export const getFile = (filename: string) => {
-    return client.bucket(bucket).file(filename);
 };
