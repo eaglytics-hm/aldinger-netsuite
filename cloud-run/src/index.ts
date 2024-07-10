@@ -30,7 +30,7 @@ app.use('/upload', (_, res, next) => {
 });
 
 app.use('/load', validator.body(LoadFromGCSBodySchema), ({ body }: ValidatedRequest<LoadFromGCSBodyRequest>, res, next) => {
-    loadFromGCS(body.filename)
+    loadFromGCS(body)
         .then((results) => res.status(200).json(results))
         .catch(next);
 });
