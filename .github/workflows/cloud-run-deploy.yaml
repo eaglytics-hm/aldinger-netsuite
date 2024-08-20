@@ -59,7 +59,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
-          image: ${{ env.IMAGE }}
+          image: ${{ env.IMAGE_TAG }}
           region: us-central1
           timeout: 120s
           flags: |
