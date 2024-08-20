@@ -12,13 +12,12 @@ export type LoadFromGCSOptions = { filename: string; table: string; schema: Tabl
 export const loadFromGCS = async ({ filename, table, schema }: LoadFromGCSOptions) => {
     logger.info(`Loading file ${filename} from GCS to ${table}`);
 
-    return await dataset
-        .table(table)
-        .load(getFile(filename), {
-            schema: { fields: schema },
-            sourceFormat: 'NEWLINE_DELIMITED_JSON',
-            createDisposition: 'CREATE_IF_NEEDED',
-            writeDisposition: 'WRITE_TRUNCATE',
-        })
-        .then(() => ({ filename }));
+    const file = getFile(filename);
+    await dataset.table(table).load(file, {
+        schema: { fields: schema },
+        sourceFormat: 'NEWLINE_DELIMITED_JSON',
+        createDisposition: 'CREATE_IF_NEEDED',
+        writeDisposition: 'WRITE_TRUNCATE',
+    });
+    return { filename };
 };

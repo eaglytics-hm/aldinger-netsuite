@@ -2,14 +2,15 @@ import { loadFromGCS } from './pipeline.service';
 
 it('loadFromGCS', async () => {
     const options = {
-        filename: '515ef4e3-7372-468a-8f49-12e01a08b320.ndjson',
-        table: 'Customer',
+        filename: 'ab436172-e8e9-48c0-8138-b781e5c46d7a.ndjson',
+        table: 'Customers',
         schema: [
             { name: 'id', type: 'STRING' },
             { name: 'name', type: 'STRING' },
             { name: 'stage', type: 'STRING' },
             { name: 'email', type: 'STRING' },
             { name: 'phone', type: 'STRING' },
+            { name: 'business_unit', type: 'STRING' },
             { name: 'legacy_id', type: 'STRING' },
             { name: 'terms', type: 'STRING' },
             { name: 'industry', type: 'STRING' },
