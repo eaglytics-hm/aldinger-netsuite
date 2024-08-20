@@ -1,6 +1,6 @@
 services:
     app:
-        image: us-docker.pkg.dev/eaglytics-project/docker-1/epic-media-notification:${GH_REF}
+        image: us-docker.pkg.dev/aldinger-426410/docker-1/aldinger-netsuite-backend
         build: .
         volumes:
             - ./${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/{GOOGLE_APPLICATION_CREDENTIALS}
