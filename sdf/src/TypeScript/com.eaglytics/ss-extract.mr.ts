@@ -14,74 +14,31 @@ import * as search from 'N/search';
 import dayjs from './dayjs.min';
 import { mapValues } from './lodash-amd';
 
-const upload = (rows: any[]) => {
-    const baseURL = 'https://aldinger-netsuite-backend-master-jh2uvgk35a-uc.a.run.app';
-
-    const getUploadUrlResponse = https.request({ method: 'POST', url: `${baseURL}/upload` });
-    if (getUploadUrlResponse.code !== 200) {
-        log.error('Create upload file', { response: getUploadUrlResponse.body });
-        const _error = error.create({ name: 'API_ERROR', message: 'Create ETL config failed' });
-        return [_error, null] as const;
-    }
-
-    const { filename, url: gcsUrl } = <{ filename: string; url: string }>JSON.parse(getUploadUrlResponse.body);
-
-    const uploadResponse = https.request({
-        method: https.Method.PUT,
-        url: gcsUrl,
-        headers: { 'Content-Type': 'text/plain' },
-        body: rows.map((row) => JSON.stringify(row)).join('\n'),
-    });
-    if (uploadResponse.code !== 200) {
-        log.error('Upload to GCS', { url: gcsUrl, response: uploadResponse.body });
-        const _error = error.create({ name: 'API_ERROR', message: 'Upload to GCS failed' });
-        log.error(_error.message, _error);
-        return [_error, null] as const;
-    }
-
-    const loadResponse = https.request({
-        method: 'POST',
-        url: `${baseURL}/load`,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename }),
-    });
-
-    if (loadResponse.code !== 200) {
-        log.error('Load from GCS', { filename, response: loadResponse.body });
-        const _error = error.create({ name: 'API_ERROR', message: 'Load from GCS failed' });
-        log.error(_error.message, _error);
-        return [_error, null] as const;
-    }
-
-    log.audit('Load from GCS', { filename, response: loadResponse.body });
-    return [null, filename] as const;
-};
-
 const getConfig = () => {
     const configs = {
         customdeploy_eag_ss_extract_1772: {
             id: 1772,
             parse: (values: any) => ({
-                account: <string>values.account?.text,
-                amount: <number>parseFloat(values['amount']),
-                business_unit: <string>values.class?.text,
-                customer_id: <string>values['entityid.customer'],
-                customer_industry: <string>values['custentity_esc_industry.customer']?.text,
-                customer_legacy_id: <string>values['custentity_ald_legacy_id.customer'],
-                customer_name: <string>values['altname.customer'],
-                customer_territory: <string>values['territory.customer']?.text,
+                account: values.account?.text,
+                amount: parseFloat(values['amount']),
+                business_unit: values.class?.text,
+                customer_id: values['entityid.customer'],
+                customer_industry: values['custentity_esc_industry.customer']?.text,
+                customer_legacy_id: values['custentity_ald_legacy_id.customer'],
+                customer_name: values['altname.customer'],
+                customer_territory: values['territory.customer']?.text,
                 date: (() => {
-                    const strValue = <string>values.trandate;
+                    const strValue = values.trandate;
                     const date = dayjs(strValue);
                     return date.isValid() ? date.format('YYYY-MM-DD') : null;
                 })(),
-                document_number: <string>values.tranid,
-                invoice_line: <number>parseInt(values.linesequencenumber),
-                item_display_name: <string>values['displayname.item'],
-                item_name: <string>values['itemid.item'],
-                location_name: <string>values.location?.text,
-                quantity: <number>parseFloat(values.quantity),
-                shipping_zip: <string>values.shipzip,
+                document_number: values.tranid,
+                invoice_line: parseInt(values.linesequencenumber),
+                item_display_name: values['displayname.item'],
+                item_name: values['itemid.item'],
+                location_name: values.location?.text,
+                quantity: parseFloat(values.quantity),
+                shipping_zip: values.shipzip,
             }),
             table: 'InvoiceLine',
             schema: [
@@ -106,26 +63,26 @@ const getConfig = () => {
         customdeploy_eag_ss_extract_1722: {
             id: 1722,
             parse: (values: any) => ({
-                id: <string>values.entityid,
-                name: <string>values.altname,
-                stage: <string>values.stage?.text,
-                email: <string>values.email,
-                phone: <string>values.phone,
-                business_unit: <string>values.custentity_ald_businessunit?.text,
+                id: values.entityid,
+                name: values.altname,
+                stage: values.stage?.text,
+                email: values.email,
+                phone: values.phone,
+                business_unit: values.custentity_ald_businessunit?.text,
                 legacy_id: values.custentity_ald_legacy_id,
-                terms: <string>values.terms?.text,
-                industry: <string>values.custentity_esc_industry?.text,
-                territory: <string>values.territory?.text,
-                salesrep: <string>values.salesrep?.text,
-                leadsource: <string>values.leadsource?.text,
+                terms: values.terms?.text,
+                industry: values.custentity_esc_industry?.text,
+                territory: values.territory?.text,
+                salesrep: values.salesrep?.text,
+                leadsource: values.leadsource?.text,
                 datecreated: (() => {
-                    const strValue = <string>values.datecreated;
+                    const strValue = values.datecreated;
                     const date = dayjs(strValue);
                     return date.isValid() ? date.toISOString() : null;
                 })(),
-                billing_address: <string>values.billaddress,
-                billing_state: <string>values.billstate?.text,
-                billing_zip: <string>values.billzipcode,
+                billing_address: values.billaddress,
+                billing_state: values.billstate?.text,
+                billing_zip: values.billzipcode,
             }),
             table: 'Customer',
             schema: [
@@ -160,6 +117,50 @@ const getConfig = () => {
         throw _error;
     }
     return config;
+};
+
+const upload = (rows: any[]) => {
+    const baseURL = 'https://aldinger-netsuite-backend-master-jh2uvgk35a-uc.a.run.app';
+
+    const getUploadUrlResponse = https.request({ method: 'POST', url: `${baseURL}/upload` });
+    if (getUploadUrlResponse.code !== 200) {
+        log.error('Create upload file', { response: getUploadUrlResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Create ETL config failed' });
+        return [_error, null] as const;
+    }
+
+    const { filename, url: gcsUrl } = <{ filename: string; url: string }>JSON.parse(getUploadUrlResponse.body);
+
+    const uploadResponse = https.request({
+        method: https.Method.PUT,
+        url: gcsUrl,
+        headers: { 'Content-Type': 'text/plain' },
+        body: rows.map((row) => JSON.stringify(row)).join('\n'),
+    });
+    if (uploadResponse.code !== 200) {
+        log.error('Upload to GCS', { url: gcsUrl, response: uploadResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Upload to GCS failed' });
+        log.error(_error.message, _error);
+        return [_error, null] as const;
+    }
+
+    const { table, schema } = getConfig();
+    const loadResponse = https.request({
+        method: 'POST',
+        url: `${baseURL}/load`,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, table, schema }),
+    });
+
+    if (loadResponse.code !== 200) {
+        log.error('Load from GCS', { filename, response: loadResponse.body });
+        const _error = error.create({ name: 'API_ERROR', message: 'Load from GCS failed' });
+        log.error(_error.message, _error);
+        return [_error, null] as const;
+    }
+
+    log.audit('Load from GCS', { filename, response: loadResponse.body });
+    return [null, filename] as const;
 };
 
 export const getInputData: EntryPoints.MapReduce.getInputData = () => {
