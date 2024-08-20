@@ -1,3 +1,4 @@
+/* eslint-disable */
 const eslint = require('@eslint/js');
 const tseslint = require('typescript-eslint');
 
