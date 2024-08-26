@@ -5,6 +5,7 @@ import { LoadFromGCSOptions as LoadFromGCSBody } from './pipeline.service';
 
 export const LoadFromGCSBodySchema = Joi.object<LoadFromGCSBody>({
     filename: Joi.string().required(),
+    schema: Joi.array().required(),
     table: Joi.string().required(),
 });
 
