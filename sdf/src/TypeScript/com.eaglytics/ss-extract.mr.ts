@@ -40,7 +40,7 @@ const getConfig = () => {
                 quantity: parseFloat(values.quantity),
                 shipping_zip: values.shipzip,
             }),
-            table: 'InvoiceLines',
+            table: 'Aldinger_Netsuite_InvoiceLines',
             schema: [
                 { name: 'account', type: 'STRING' },
                 { name: 'amount', type: 'NUMERIC' },
@@ -84,7 +84,7 @@ const getConfig = () => {
                 billing_state: values.billstate?.text,
                 billing_zip: values.billzipcode,
             }),
-            table: 'Customers',
+            table: 'Aldinger_Netsuite_Customers',
             schema: [
                 { name: 'id', type: 'STRING' },
                 { name: 'name', type: 'STRING' },

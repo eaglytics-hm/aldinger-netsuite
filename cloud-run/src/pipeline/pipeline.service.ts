@@ -5,7 +5,7 @@ import { getLogger } from '../logging.service';
 
 const logger = getLogger(__filename);
 const client = new BigQuery();
-const dataset = client.dataset('NetSuite');
+const dataset = client.dataset('RawData_INV');
 
 export type LoadFromGCSOptions = { filename: string; table: string; schema: TableSchema['fields'] };
 
