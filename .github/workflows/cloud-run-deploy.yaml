@@ -1,4 +1,4 @@
-name: Cloud Run
+name: Cloud Run Deploy
 
 on:
   push:
@@ -13,7 +13,7 @@ concurrency: ${{ github.ref }}-${{ github.workflow }}
 
 env:
   IMAGE_TAG: us-docker.pkg.dev/aldinger-426410/docker-1/aldinger-netsuite-backend
-  SERVICE_NAME: aldinger-netsuite-backend-${{ github.ref_name }}
+  SERVICE_NAME: aldinger-netsuite-backend
 
 jobs:
   build-image:
