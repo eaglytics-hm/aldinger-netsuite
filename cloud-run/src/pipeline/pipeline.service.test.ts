@@ -2,8 +2,8 @@ import { loadFromGCS } from './pipeline.service';
 
 it('loadFromGCS', async () => {
     const options = {
-        filename: 'ab436172-e8e9-48c0-8138-b781e5c46d7a.ndjson',
-        table: 'Customers',
+        filename: '8b292cae-7e3f-4537-a9d9-5dcc0865ccc6.ndjson',
+        table: 'Aldinger_Netsuite_Customers',
         schema: [
             { name: 'id', type: 'STRING' },
             { name: 'name', type: 'STRING' },
