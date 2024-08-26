@@ -120,7 +120,7 @@ const getConfig = () => {
 };
 
 const upload = (rows: any[]) => {
-    const baseURL = 'https://aldinger-netsuite-backend-master-jh2uvgk35a-uc.a.run.app';
+    const baseURL = 'https://aldinger-netsuite-backend-jh2uvgk35a-uc.a.run.app';
 
     const getUploadUrlResponse = https.request({ method: 'POST', url: `${baseURL}/upload` });
     if (getUploadUrlResponse.code !== 200) {
