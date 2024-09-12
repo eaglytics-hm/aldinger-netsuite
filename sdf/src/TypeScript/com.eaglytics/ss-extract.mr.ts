@@ -83,6 +83,8 @@ const getConfig = () => {
                 billing_address: values.billaddress,
                 billing_state: values.billstate?.text,
                 billing_zip: values.billzipcode,
+                custentity_ald_naics_sector: values.custentity_ald_naics_sector?.text,
+                custentity_ald_naics_specific_industry: values.custentity_ald_naics_specific_industry?.text,
             }),
             table: 'Aldinger_Netsuite_Customers',
             schema: [
@@ -102,6 +104,8 @@ const getConfig = () => {
                 { name: 'billing_address', type: 'STRING' },
                 { name: 'billing_state', type: 'STRING' },
                 { name: 'billing_zip', type: 'STRING' },
+                { name: 'custentity_ald_naics_sector', type: 'STRING' },
+                { name: 'custentity_ald_naics_specific_industry', type: 'STRING' },
             ],
         },
     };
